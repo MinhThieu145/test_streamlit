@@ -1,6 +1,7 @@
 import streamlit as st
 import s3fs
 import os
+import csv
 
 
 st.title("Welcome to my world")
@@ -18,5 +19,5 @@ def read_file(filename):
 content = read_file("library-scraping-storage/library_schedule_10_29.csv")
 
 # Print results.
-for line in content.strip().split("\n"):
-    st.write(line)
+df = pd.read_csv(content)
+st.write(df)
