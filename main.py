@@ -19,5 +19,5 @@ def read_file(filename):
 content = read_file("library-scraping-storage/library_schedule_10_29.csv")
 
 # Print results.
-df = pd.read_csv(content)
+df = pd.read_csv("library-scraping-storage/library_schedule_10_29.csv")
 st.write(df)
