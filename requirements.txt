@@ -4,3 +4,5 @@
 streamlit==1.13.0
 pandas==1.4.4
 s3fs==2022.10.0
+numpy-base==1.23.1
+plotly==5.11.0
