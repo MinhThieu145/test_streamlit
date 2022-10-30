@@ -14,8 +14,9 @@ fs = s3fs.S3FileSystem(anon=False)
 @st.experimental_memo(ttl=600)
 def read_file(filename):
     with fs.open(filename) as f:
-        return f.read().decode("utf-8")
-        df = pd.read_csv(f)
+        file = csv.reader(f)
+        df = pd.DataFrame(file)
+        df.columns = df.iloc[0,:].values
         st.write(df)
 
 content = read_file("library-scraping-storage/library_schedule_10_29.csv")
