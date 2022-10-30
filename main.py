@@ -14,7 +14,7 @@ fs = s3fs.S3FileSystem(anon=False)
 # Uses st.experimental_memo to only rerun when the query changes or after 10 min.
 @st.experimental_memo(ttl=600)
 def read_file(filename):
-    with fs.open(filename) as f:
+    with fs.open(filename,'r') as f:
         file = csv.reader(f)
         df = pd.DataFrame(file)
         df.columns = df.iloc[0,:].values
