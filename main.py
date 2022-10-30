@@ -15,9 +15,10 @@ fs = s3fs.S3FileSystem(anon=False)
 def read_file(filename):
     with fs.open(filename) as f:
         return f.read().decode("utf-8")
+        df = pd.read_csv(f)
+        st.write(df)
 
 content = read_file("library-scraping-storage/library_schedule_10_29.csv")
 
 # Print results.
-df = pd.read_csv("library-scraping-storage/library_schedule_10_29.csv")
-st.write(df)
+
