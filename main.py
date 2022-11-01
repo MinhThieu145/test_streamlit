@@ -5,6 +5,7 @@ import pandas as pd
 import csv
 from datetime import datetime
 
+from ExtraClasses import AvailabilityEachDay
 
 st.title("Welcome to my world")
 st.write("### Sucks. Isn't it?")
@@ -28,6 +29,7 @@ df = read_file("library-scraping-storage/library_schedule_10_29.csv")
 st.write(df)
 
 
+
 # Get the length of the block we want to find
 st.write('### The length of your study session')
 study_length = st.select_slider('no value', options=['15 min','30 min','45 min','1 hour',
@@ -35,6 +37,8 @@ study_length = st.select_slider('no value', options=['15 min','30 min','45 min',
                                                                  label_visibility='collapsed')
 
 st.write('you study for: ', study_length)
+
+
 
 # The week list is still in Indext date type
 week_list = pd.date_range(start='10-23-2022', end='12-12-2022', freq='W').strftime("%Y-%m-%d").tolist()
@@ -83,6 +87,20 @@ with col5:
 
     end_minute = st.selectbox(label='minute', options=minute_list_after,key='minute_list_1')
 
+def ConvertStudyLength(study_length):
+    switcher = {
+        '15 min':1,
+        '30 min':2,
+        '45 min':3,
+        '1 hour':4,
+        '1 hour 15 min' : 5,
+        '1 hour 30 min' : 6,
+        '1 hour 45 min' : 7,
+        '2 hour':8
+    }
+
+    return switcher.get(study_length)
+
 
 def ApplyUserOptions(df):
     # Select the best week
@@ -95,6 +113,46 @@ def ApplyUserOptions(df):
 
     return df
 
+def CountHourBlockDay(study_length_convert, each_room_each_day_df):
+    i = 0
+    n= study_length_convert
+    study_block_count = 0
+
+    while i <= len(each_room_each_day_df):
+        status_list = each_room_each_day_df.iloc[i:i+n,:].status.tolist()
+        
+        if ( 
+            ('Unavailable' not in status_list) & # condition 1: đéo có cái Unavailable ở đây
+            (len(status_list) == n) # Phải đủ 4 block continuos
+            ):
+            temp_df = each_room_each_day_df.iloc[i:i+4,:]
+            result_df = pd.concat([temp_df, result_df])
+            i = i + n
+
+            study_block_count += 1
+    
+        i += 1
+
+
+
+    
+
+def CountHourBlock(df):
+    # will chỉnh later
+    count_each_day_of_week = {}
+    result_df = pd.DataFrame(columns=df.columns)
+    
+    for day_of_week in df.day_of_week.unique().tolist():
+        each_day_df = df[df.day_of_week == day_of_week]
+
+        # now calculate it for each room:
+        for room in each_day_df.room:
+            each_room_each_day_df = each_day_df[each_day_df.room == room]
+            CountHourBlockDay()
+
+        break
+
+    return df
 
 def ProprecessDataframe(df):
     # Convert the hour column -> make it to 24-hour instead
@@ -127,6 +185,13 @@ def ProprecessDataframe(df):
 
     return df
 
+
 st.write('### Dataframe after proprocessed')
 st.write(ProprecessDataframe(df=df))
+
+saturday_availability = AvailabilityEachDay(day_of_week='Saturday')
+st.write(saturday_availability.day_of_week)
+
+
+
 
